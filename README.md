@@ -17,6 +17,3 @@ Este projeto tem como objetivo converter laudos médicos em formato PDF para arq
 - Python 3.x instalado na máquina.
 - Bibliotecas Python necessárias instaladas (pdfplumber, python-docx, etc.).
 - Acesso aos laudos médicos em formato PDF.
- 
-
-Teste
