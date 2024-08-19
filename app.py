@@ -6,28 +6,34 @@ from PIL import Image
 from docx import Document
 import pdfplumber
 import io
+from dotenv import load_dotenv
 
-app = Flask(__name__)
+# Carregar variáveis do .env
+load_dotenv()
 
 # Configurações
 UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', 'uploads')
 RESULT_FOLDER = os.getenv('RESULT_FOLDER', 'results')
-ALLOWED_EXTENSIONS = {'pdf'}
-pytesseract.pytesseract.tesseract_cmd = os.getenv('TESSERACT_CMD', '/usr/bin/tesseract')
+pytesseract.pytesseract.tesseract_cmd = os.getenv('TESSERACT_CMD', 'tesseract')
 poppler_path = os.getenv('POPPLER_PATH', '/usr/bin/poppler')
+
+app = Flask(__name__)
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['RESULT_FOLDER'] = RESULT_FOLDER
+ALLOWED_EXTENSIONS = {'pdf'}
 
 # Funções auxiliares
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def aplicar_ocr_pdf(caminho_arquivo):
+    print(f"Processando o arquivo: {caminho_arquivo}")  # Adicione um log
     paginas = convert_from_path(caminho_arquivo, 300, poppler_path=poppler_path)
     texto_completo = ""
     for pagina in paginas:
         texto = pytesseract.image_to_string(pagina, lang='por')
+        print(f"Texto extraído: {texto[:100]}")  # Log do texto extraído (primeiros 100 caracteres)
         texto_completo += texto + "\n\n"
     return texto_completo
 
@@ -72,6 +78,7 @@ def upload_file():
             salvar_como_docx(texto, docx_path)
             return send_from_directory(app.config['RESULT_FOLDER'], 'resultado.docx', as_attachment=True)
         except Exception as e:
+            print(f"Erro ao aplicar OCR: {e}")
             with open(file_path, 'rb') as f:
                 pdf_bytes = f.read()
             docx_file = convert_pdf_to_docx(pdf_bytes)
@@ -96,6 +103,7 @@ def convert():
             docx_path = os.path.join(app.config['RESULT_FOLDER'], 'resultado.docx')
             salvar_como_docx(texto, docx_path)
         except Exception as e:
+            print(f"Erro ao aplicar OCR: {e}")
             with open(file_path, 'rb') as f:
                 pdf_bytes = f.read()
             docx_file = convert_pdf_to_docx(pdf_bytes)

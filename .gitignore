@@ -29,3 +29,8 @@ dist/
 # Ignore test coverage reports
 .coverage
 *.cover
+
+
+.env
+.env.development
+.env.production
