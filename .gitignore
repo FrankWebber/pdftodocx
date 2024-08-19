@@ -1,0 +1,15 @@
+# Ignore the virtual environment
+venv/
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+
+# Ignore uploads and results
+uploads/
+results/
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+desktop.ini
