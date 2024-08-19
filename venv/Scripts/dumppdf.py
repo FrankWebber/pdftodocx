@@ -1,4 +1,4 @@
-#!C:\Users\Karoline\Documents\GitHub\pdftodocx\venv\Scripts\python.exe
+#!D:\pdftodocx\venv\Scripts\python.exe
 """Extract pdf structure in XML format"""
 import logging
 import os.path
