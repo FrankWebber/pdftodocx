@@ -1,5 +1,7 @@
 # Ignore the virtual environment
 venv/
+
+# Ignore Python cache files
 *.pyc
 __pycache__/
 *.pyo
@@ -13,3 +15,19 @@ results/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Ignore environment configuration files
+.env
+
+# Ignore IDE and editor-specific files
+.vscode/
+.idea/
+
+# Ignore build and distribution directories
+build/
+dist/
+*.egg-info/
+
+# Ignore test coverage reports
+.coverage
+*.cover

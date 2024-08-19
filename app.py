@@ -1,5 +1,5 @@
-from flask import Flask, request, redirect, send_from_directory, send_file, render_template, jsonify
 import os
+from flask import Flask, request, redirect, send_from_directory, send_file, render_template, jsonify
 import pytesseract
 from pdf2image import convert_from_path
 from PIL import Image
@@ -10,11 +10,11 @@ import io
 app = Flask(__name__)
 
 # Configurações
-UPLOAD_FOLDER = 'uploads'
-RESULT_FOLDER = r'D:\pdftodocx\results'  # Caminho absoluto para a pasta results
+UPLOAD_FOLDER = os.getenv('UPLOAD_FOLDER', 'uploads')
+RESULT_FOLDER = os.getenv('RESULT_FOLDER', 'results')
 ALLOWED_EXTENSIONS = {'pdf'}
-pytesseract.pytesseract.tesseract_cmd = r'C:\Users\43803016215\AppData\Local\Programs\Tesseract-OCR\tesseract.exe'
-poppler_path = r'C:\Program Files\poppler-24.07.0\Library\bin'
+pytesseract.pytesseract.tesseract_cmd = os.getenv('TESSERACT_CMD', '/usr/bin/tesseract')
+poppler_path = os.getenv('POPPLER_PATH', '/usr/bin/poppler')
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['RESULT_FOLDER'] = RESULT_FOLDER
@@ -70,10 +70,8 @@ def upload_file():
             texto = aplicar_ocr_pdf(file_path)
             docx_path = os.path.join(app.config['RESULT_FOLDER'], 'resultado.docx')
             salvar_como_docx(texto, docx_path)
-            # Após salvar, retorna o arquivo DOCX para download
             return send_from_directory(app.config['RESULT_FOLDER'], 'resultado.docx', as_attachment=True)
         except Exception as e:
-            # Se não for possível usar OCR, extrair texto diretamente
             with open(file_path, 'rb') as f:
                 pdf_bytes = f.read()
             docx_file = convert_pdf_to_docx(pdf_bytes)
@@ -87,14 +85,12 @@ def upload_file():
 
 @app.route('/convert', methods=['POST'])
 def convert():
-    # Recebe o PDF enviado na solicitação POST
     file = request.files.get('file')
     if file and allowed_file(file.filename):
         filename = 'uploaded.pdf'
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(file_path)
 
-        # Realiza a conversão do PDF para DOCX
         try:
             texto = aplicar_ocr_pdf(file_path)
             docx_path = os.path.join(app.config['RESULT_FOLDER'], 'resultado.docx')
@@ -107,12 +103,10 @@ def convert():
             with open(docx_path, 'wb') as f:
                 f.write(docx_file.getvalue())
 
-        # Após a conversão, disponibiliza o download automático do arquivo
         return send_from_directory(app.config['RESULT_FOLDER'], 'resultado.docx', as_attachment=True)
 
     return jsonify({"message": "Falha no upload ou arquivo inválido!"})
 
-# Inicialização do servidor Flask
 if __name__ == '__main__':
     if not os.path.exists(UPLOAD_FOLDER):
         os.makedirs(UPLOAD_FOLDER)
