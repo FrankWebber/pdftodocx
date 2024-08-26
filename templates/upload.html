@@ -8,8 +8,14 @@
 <body>
     <h1>Upload de PDF para Conversão</h1>
     <form action="/convert" method="post" enctype="multipart/form-data">
-        <input type="file" name="file" accept="application/pdf">
+        <input type="file" name="file" accept="application/pdf" required>
         <button type="submit">Converter para DOCX</button>
     </form>
+    <p id="feedback"></p>
+    <script>
+        document.querySelector('form').onsubmit = function() {
+            document.getElementById('feedback').textContent = 'Processando...';
+        }
+    </script>
 </body>
 </html>
